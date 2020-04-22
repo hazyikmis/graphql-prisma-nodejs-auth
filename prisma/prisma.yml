@@ -1,0 +1,6 @@
+endpoint: http://localhost:4466
+datamodel: datamodel.prisma
+#service: default
+#stage: default
+#the name of the schema creeated is: default$default
+#(because we deleted "schema" key from docker-compose.yml)

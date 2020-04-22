@@ -1,0 +1,21 @@
+{
+  "name": "graphql-basics_prj_structure",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon src/index.js -e js,graphql",
+    "start": "node src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "get-schema": "graphql get-schema -p prisma"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "graphql-cli": "^3.0.14",
+    "graphql-yoga": "^1.18.3",
+    "prisma-binding": "^2.3.16",
+    "uuid": "^7.0.3"
+  }
+}

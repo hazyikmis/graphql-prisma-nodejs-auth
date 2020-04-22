@@ -1,0 +1,29 @@
+#There are 2 options when deleting an item: SET_NULL (default) - CASCADE
+
+#If a "user" deleted, what happens to "posts", it's show in the @relation: PostToUser
+#If a "user" deleted, what happens to "comments", it's show in the @relation: CommentToUser
+type User {
+  id: ID! @id
+  name: String!
+  email: String! @unique
+  posts: [Post!]! @relation(name: "PostToUser", onDelete: CASCADE)
+  comments: [Comment!]! @relation(name: "CommentToUser", onDelete: CASCADE)
+}
+
+#If a "post" deleted, then author should not be deleted :)
+#If a "post" deleted, then comments should be deleted
+type Post {
+  id: Int! @id
+  title: String!
+  body: String!
+  published: Boolean!
+  author: User! @relation(name: "PostToUser", onDelete: SET_NULL)
+  comments: [Comment!]! @relation(name: "CommentToPost", onDelete: CASCADE)
+}
+
+type Comment {
+  id: ID! @id
+  text: String!
+  post: Post! @relation(name: "CommentToPost", onDelete: SET_NULL)
+  author: User! @relation(name: "CommentToUser", onDelete: SET_NULL)
+}

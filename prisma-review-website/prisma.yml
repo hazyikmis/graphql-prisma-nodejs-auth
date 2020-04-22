@@ -1,0 +1,6 @@
+endpoint: http://localhost:4466/reviews/default
+datamodel: datamodel.prisma
+#service: reviews
+#stage: default
+#the name of the database creeated is: reviews$default
+#(because we deleted "schema" key from docker-compose.yml)
