@@ -1,33 +1,29 @@
 const { v4: uuidv4 } = require("uuid");
 
-//Enum types
-//UserRole - standart, editor, admin
-// type User {
-//   role: UserRole!
-// }
-
-//laptop.isOn : true - false
-//laptop.powerStatus: on - off - sleep
-//"mutation" filed in subscriptions could be good example of "Enum"
-
 const Mutation = {
-  createUser(parent, args, { db }, info) {
-    const emailTaken = db.users.some((user) => user.email === args.data.email);
+  //createUser(parent, args, { db }, info) {
+  async createUser(parent, args, { prisma }, info) {
+    //const emailTaken = db.users.some((user) => user.email === args.data.email);
+    const emailTaken = await prisma.exists.User({ email: args.data.email });
 
+    //is it also possible to not check "exists" and send data to prisma and wait for if any error!
     if (emailTaken) {
       throw new Error("Email taken!");
     }
 
-    const newUser = {
-      id: uuidv4(),
-      ...args.data,
-    };
+    // const newUser = {
+    //   id: uuidv4(),
+    //   ...args.data,
+    // };
 
-    db.users.push(newUser);
+    // db.users.push(newUser);
 
-    return newUser;
+    //return newUser;
+
+    return await prisma.mutation.createUser({ data: args.data }, info);
   },
 
+  /*
   deleteUser(parent, args, { db }, info) {
     const userIndex = db.users.findIndex((user) => user.id === args.id);
 
@@ -52,6 +48,16 @@ const Mutation = {
     db.comments = db.comments.filter((comment) => comment.author !== args.id);
 
     return deletedUsers[0];
+  },
+*/
+  async deleteUser(parent, args, { prisma }, info) {
+    const userExists = await prisma.exists.User({ id: args.id });
+
+    if (!userExists) {
+      throw new Error("User not found!");
+    }
+
+    return await prisma.mutation.deleteUser({ where: { id: args.id } }, info);
   },
 
   //updateUser(parent, args, { db }, info) {
