@@ -15,6 +15,9 @@ const { prisma } = require("./prisma");
 
 const pubsub = new PubSub();
 
+//"src/schema.graphql" is similar but not the same with "prisma/datamodel.prisma"
+//schema.graphql used by NodeJS app, as referencing below
+//but datamodel.prisma used by GraphQL Server, when deploying the model
 const server = new GraphQLServer({
   typeDefs: "./src/schema.graphql",
   resolvers: {

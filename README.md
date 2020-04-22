@@ -5,7 +5,22 @@ localhost:4000 created and served by NodeJS app, but localhost:4466 created and 
 > "Authorization":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6Ikp...."
 > }
 
-#-------
+##-------
+
+"src/schema.graphql" is similar but not the same with "prisma/datamodel.prisma"
+schema.graphql used by NodeJS app, as referencing below
+but datamodel.prisma used by GraphQL Server, when deploying the model
+
+##-------
+
+After adding "password" field to User inside the datamodel.prisma file, we need to delete and redeploy the model by typing "prisma delete" and then "prisma deploy". (I AM NOT SURE TO DELETE THE WHOLE SCHEMA, IT WOULD WORK IF WE DELETE JUST THE USERS TABLE ON THE DATABASE...maybe references between the tables might be problem!!!)
+After that we need to get-schema again (>npm run get-schema) to replace the file "src/generated/prisma.graphql"
+BUUUUT this command does not work! Because we have locked GraphQL Server (localhost:4466) (by adding secret into the prisma/prisma.yml). To solve this problem, we are adding a "key":"value" into the file ".graphqlconfig".
+Under the extensions (add the pair below):
+"prisma": "prisma/prisma.yml"
+By adding this, we are telling NodeJS app that, you can use the "secret" info or any other info written in the "prisma/prisma.yml" file. And now "npm run get-schema" command works without any problem.
+
+##-------
 
 IN THIS PROJECT NodeJs App, queries, and makes CRUD Operations on real database, served by GraphQL --> PostgreSQL, not db.js (satatic data)
 In doing that, it uses the "prisma".
