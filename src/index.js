@@ -11,7 +11,7 @@ const { Comment } = require("./resolvers/Comment");
 const db = require("./db");
 
 //require("./prisma");
-const prisma = require("./prisma");
+const { prisma } = require("./prisma");
 
 const pubsub = new PubSub();
 

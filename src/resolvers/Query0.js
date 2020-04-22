@@ -12,25 +12,9 @@ const Query = {
     };
   },
   //usersByName(parent, args, { db }, nfo) {
-  users(parent, args, { prisma }, info) {
-    //return prisma.query.users(null, info); //retrieves all SCALAR fields' data
-    const opArgs = {};
-    if (args.query) {
-      // opArgs.where = {
-      //   name_contains: args.query,
-      // };
-      opArgs.where = {
-        OR: [
-          {
-            name_contains: args.query,
-          },
-          {
-            email_contains: args.query,
-          },
-        ],
-      };
-    }
-    return prisma.query.users(opArgs, info);
+  users(parent, args, { db, prisma }, info) {
+    //the code below retrieves info from real database accessed via GraphQL (run on docker)
+    return prisma.query.users(null, info); //retrieves all SCALAR fields' data
     //console.log(prisma);
     //the code below retrieves info from static db.js
     /*
@@ -50,7 +34,8 @@ const Query = {
       user.name.toLowerCase().includes(args.query.toLowerCase())
     );
   },
-  usersByQuery(parent, args, { db }, nfo) {
+  //usersByQuery(parent, args, { db }, nfo) {
+  usersByQuery(parent, args, { db, prisma }, nfo) {
     console.log("xxx");
     if (!args.id && !args.name && !args.email && !args.age) {
       return db.users;
@@ -65,25 +50,9 @@ const Query = {
     });
   },
   //posts(parent, args, { db }, info) {
-  posts(parent, args, { prisma }, info) {
+  posts(parent, args, { db, prisma }, info) {
     //the code below retrieves info from real database accessed via GraphQL (run on docker)
-    //return prisma.query.posts(null, info); //retrieves all SCALAR fields' data
-    const opArgs = {};
-
-    if (args.query) {
-      opArgs.where = {
-        OR: [
-          {
-            title_contains: args.query,
-          },
-          {
-            body_contains: args.query,
-          },
-        ],
-      };
-    }
-
-    return prisma.query.posts(opArgs, info);
+    return prisma.query.posts(null, info);
     //the code below retrieves info from static db.js
     /*
     if (!args.query) {
@@ -101,9 +70,8 @@ const Query = {
     */
   },
   //comments(parent, args, { db }, info) {
-  comments(parent, args, { prisma }, info) {
-    //no arguments defined in comments query, check schema.graphql
-    return prisma.query.comments(null, info);
+  comments(parent, args, { db, prisma }, info) {
+    return db.comments;
   },
 };
 
