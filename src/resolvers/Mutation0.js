@@ -1,29 +1,24 @@
 const { v4: uuidv4 } = require("uuid");
 
 const Mutation = {
-  //createUser(parent, args, { db }, info) {
-  async createUser(parent, args, { prisma }, info) {
-    //const emailTaken = db.users.some((user) => user.email === args.data.email);
-    const emailTaken = await prisma.exists.User({ email: args.data.email });
+  createUser(parent, args, { db }, info) {
+    const emailTaken = db.users.some((user) => user.email === args.data.email);
 
     //is it also possible to not check "exists" and send data to prisma and wait for if any error!
     if (emailTaken) {
       throw new Error("Email taken!");
     }
 
-    // const newUser = {
-    //   id: uuidv4(),
-    //   ...args.data,
-    // };
+    const newUser = {
+      id: uuidv4(),
+      ...args.data,
+    };
 
-    // db.users.push(newUser);
+    db.users.push(newUser);
 
-    //return newUser;
-
-    return await prisma.mutation.createUser({ data: args.data }, info);
+    return newUser;
   },
 
-  /*
   deleteUser(parent, args, { db }, info) {
     const userIndex = db.users.findIndex((user) => user.id === args.id);
 
@@ -49,19 +44,8 @@ const Mutation = {
 
     return deletedUsers[0];
   },
-*/
-  async deleteUser(parent, args, { prisma }, info) {
-    const userExists = await prisma.exists.User({ id: args.id });
 
-    if (!userExists) {
-      throw new Error("User not found!");
-    }
-
-    return await prisma.mutation.deleteUser({ where: { id: args.id } }, info);
-  },
-
-  /*
-//updateUser(parent, args, { db }, info) {
+  //updateUser(parent, args, { db }, info) {
   //  const {id, data} = args;
   updateUser(parent, { id, data }, { db }, info) {
     //console.log("xxx");
@@ -91,85 +75,34 @@ const Mutation = {
 
     return user;
   },
-*/
 
-  /*
-async updateUser(parent, args, { prisma }, info) {
-  return await prisma.mutation.updateUser(
-    {
-      where: {
-        id: args.id
-      },
-      data: args.data
-    },
-    info
-  );
-},
-*/
-
-  //more simplifed version
-  async updateUser(parent, { id, data }, { prisma }, info) {
-    //you can check prisma.exists.User... if you want...
-    return await prisma.mutation.updateUser(
-      {
-        where: {
-          id,
-        },
-        data,
-      },
-      info
-    );
-  },
-
-  //createPost(parent, args, { db, pubsub }, info) {
-  async createPost(parent, args, { prisma }, info) {
-    // const userExist = db.users.some((user) => user.id === args.data.author);
-    const userExist = await prisma.exists.User({ id: args.data.author });
+  createPost(parent, args, { db, pubsub }, info) {
+    const userExist = db.users.some((user) => user.id === args.data.author);
 
     if (!userExist) {
       throw new Error("User not found!");
     }
 
-    // const newPost = {
-    //   id: uuidv4(),
-    //   ...args.data,
-    // };
+    const newPost = {
+      id: uuidv4(),
+      ...args.data,
+    };
 
-    // db.posts.push(newPost);
+    db.posts.push(newPost);
 
-    //NO NEED TO THINK ABOUT SUBSCRIPTIONS IN PRISMA!!!
-    //AUTOMATICALLY DONE, NO NEED TO SEND/RECEIVE "pubsub"
-    // if (newPost.published) {
-    //   //pubsub.publish("post", { post: newPost });
-    //   pubsub.publish("post", {
-    //     post: {
-    //       mutation: "CREATED",
-    //       data: newPost,
-    //     },
-    //   });
-    // }
-
-    // return newPost;
-
-    //if we had not checked the userExist, then just the ONE LINE code below is enough to create a post!!!
-    return await prisma.mutation.createPost(
-      {
-        data: {
-          title: args.data.title,
-          body: args.data.body,
-          published: args.data.published,
-          author: {
-            connect: {
-              id: args.data.author,
-            },
-          },
+    if (newPost.published) {
+      //pubsub.publish("post", { post: newPost });
+      pubsub.publish("post", {
+        post: {
+          mutation: "CREATED",
+          data: newPost,
         },
-      },
-      info
-    );
+      });
+    }
+
+    return newPost;
   },
 
-  /*  
   updatePost(parent, args, { db, pubsub }, info) {
     //  const {id, data} = args; //could be better!!! DEFINITELY!!!
     const post = db.posts.find((post) => post.id === args.id);
@@ -219,27 +152,7 @@ async updateUser(parent, args, { prisma }, info) {
 
     return post;
   },
-  */
 
-  async updatePost(parent, args, { prisma }, info) {
-    //you can check prisma.exists.Post... if you want...
-    const postExists = await prisma.exists.Post({ id: parseInt(args.id) });
-    if (!postExists) {
-      throw new Error("Post not found!");
-    }
-
-    return await prisma.mutation.updatePost(
-      {
-        where: {
-          id: parseInt(args.id),
-        },
-        data: args.data,
-      },
-      info
-    );
-  },
-
-  /*
   deletePost(parent, args, { db, pubsub }, info) {
     const postIndex = db.posts.findIndex((post) => post.id === args.id);
     if (postIndex === -1) {
@@ -264,20 +177,7 @@ async updateUser(parent, args, { prisma }, info) {
     //return deletedPosts[0];
     return deletedPost;
   },
-*/
-  async deletePost(parent, args, { prisma }, info) {
-    const postExists = await prisma.exists.Post({ id: parseInt(args.id) });
-    if (!postExists) {
-      throw new Error("Post not found!");
-    }
 
-    return await prisma.mutation.deletePost(
-      { where: { id: parseInt(args.id) } },
-      info
-    );
-  },
-
-  /*
   createComment(parent, args, { db, pubsub }, info) {
     const userExist = db.users.some((user) => user.id === args.data.author);
     const postExist = db.posts.some(
@@ -308,30 +208,7 @@ async updateUser(parent, args, { prisma }, info) {
 
     return newComment;
   },
-*/
 
-  async createComment(parent, args, { prisma }, info) {
-    return await prisma.mutation.createComment(
-      {
-        data: {
-          text: args.data.text,
-          author: {
-            connect: {
-              id: args.data.author,
-            },
-          },
-          post: {
-            connect: {
-              id: parseInt(args.data.post),
-            },
-          },
-        },
-      },
-      info
-    );
-  },
-
-  /*
   deleteComment(parent, args, { db, pubsub }, info) {
     const commentIndex = db.comments.findIndex(
       (comment) => comment.id === args.id
@@ -348,19 +225,7 @@ async updateUser(parent, args, { prisma }, info) {
     });
     return deletedComment;
   },
-*/
 
-  async deleteComment(parent, { id }, { prisma }, info) {
-    const commentExists = await prisma.exists.Comment({ id });
-
-    if (!commentExists) {
-      throw new Error("Comment not found!");
-    }
-
-    return await prisma.mutation.deleteComment({ where: { id } }, info);
-  },
-
-  /*
   updateComment(parents, args, ctx, info) {
     const { id, data } = args;
     const { db, pubsub } = ctx;
@@ -380,30 +245,6 @@ async updateUser(parent, args, { prisma }, info) {
     });
 
     return comment;
-  },
-*/
-
-  async updateComment(parents, args, ctx, info) {
-    const { id, data } = args;
-    const { prisma } = ctx;
-
-    const commentExists = await prisma.exists.Comment({ id });
-
-    if (!commentExists) {
-      throw new Error("Comment not found!");
-    }
-
-    return await prisma.mutation.updateComment(
-      {
-        data: {
-          text: data.text,
-        },
-        where: {
-          id,
-        },
-      },
-      info
-    );
   },
 };
 
