@@ -1,5 +1,6 @@
 endpoint: http://localhost:4466
 datamodel: datamodel.prisma
+secret: thisIsMySuperS3cretText
 #service: default
 #stage: default
 #the name of the schema creeated is: default$default

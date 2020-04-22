@@ -1,3 +1,12 @@
+We have 2 endpoints: localhost:4466 & localhost:4000
+localhost:4000 created and served by NodeJS app, but localhost:4466 created and served by GraphQL Server from docker container. If we define "secret" in the "prisma/prisma.yml" file and then redeploy our app to localhost:4466, its not possible to make queries, mutations, etc from it. And also from localhost:4000. But if we define this secret in the NodeJS app (prisma.js) when defining the prisma (binding), it's possible to communicate with localhost:4000, but still not possible to communicate localhost:4466 on the Playground GraphQL. If we want to test something or work on schema/docs directly on localhost:4466 (GraphQL Server), we need to create token and use it on localhost:4466 Playground. We can create token by typing "prisma token" on the terminal under the "project/prisma" folder. It shows the token. And then, we can use this token int he playground by adding HTTP HEADERS:
+
+> {
+> "Authorization":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6Ikp...."
+> }
+
+#-------
+
 IN THIS PROJECT NodeJs App, queries, and makes CRUD Operations on real database, served by GraphQL --> PostgreSQL, not db.js (satatic data)
 In doing that, it uses the "prisma".
 
