@@ -127,22 +127,31 @@ const Mutation = {
     };
   },
 
-  async deleteUser(parent, args, { prisma }, info) {
-    const userExists = await prisma.exists.User({ id: args.id });
+  //(user)"id" argument removed from deleteUser mutation,
+  //because, everyone can delete ownself... and this means (user)"id" should be extracted from token
+  //async deleteUser(parent, args, { prisma }, info) {
+  async deleteUser(parent, args, { prisma, request }, info) {
+    //const userExists = await prisma.exists.User({ id: args.id });
 
-    if (!userExists) {
-      throw new Error("User not found!");
-    }
+    // if (!userExists) {
+    //   throw new Error("User not found!");
+    // }
 
-    return await prisma.mutation.deleteUser({ where: { id: args.id } }, info);
+    const userId = getUserId(request);
+    //return await prisma.mutation.deleteUser({ where: { id: args.id } }, info);
+    return await prisma.mutation.deleteUser({ where: { id: userId } }, info);
   },
 
-  async updateUser(parent, { id, data }, { prisma }, info) {
-    //you can check prisma.exists.User... if you want...
+  //(user)"id" argument removed from updateUser mutation,
+  //because, everyone can update ownself... and this means (user)"id" should be extracted from token
+  //async updateUser(parent, { id, data }, { prisma }, info) {
+  async updateUser(parent, { data }, { prisma, request }, info) {
+    const userId = getUserId(request);
     return await prisma.mutation.updateUser(
       {
         where: {
-          id,
+          //id,
+          id: userId,
         },
         data,
       },
@@ -150,6 +159,7 @@ const Mutation = {
     );
   },
 
+  //async createPost(parent, args, { prisma }, info) {
   async createPost(parent, args, { prisma, request }, info) {
     //SINCE we are getting user.id (author) from token, we are no more required it as a parameter/argument
     //So, we have changed the "CreatePostInput" input type accordingly
@@ -197,10 +207,33 @@ const Mutation = {
     );
   },
 
-  async deletePost(parent, args, { prisma }, info) {
-    const postExists = await prisma.exists.Post({ id: parseInt(args.id) });
+  //async deletePost(parent, args, { prisma }, info) {
+  async deletePost(parent, args, { prisma, request }, info) {
+    // const postExists = await prisma.exists.Post({ id: parseInt(args.id) });
+    // if (!postExists) {
+    //   throw new Error("Post not found!");
+    // }
+
+    //there is no way to add author/user id into the where condition
+    //because, if you check from localhos:4466 (GraphQL Server) there is no way to query post with user/author id
+    //We can only delete a post by providing only post id. As a result, we need to add more code
+    //to confirm this post belongs to the user which his/hor token contains user info: prisma.exists.User...
+    // return await prisma.mutation.deletePost(
+    //   { where: { id: parseInt(args.id) } },
+    //   info
+    // );
+
+    const userId = getUserId(request);
+    const postExists = await prisma.exists.Post({
+      id: parseInt(args.id),
+      author: {
+        id: userId,
+      },
+    });
+
+    //Now if you try to delete somenone elses post, it could not be found and the app throws an error...
     if (!postExists) {
-      throw new Error("Post not found!");
+      throw new Error("Unable to delete post!");
     }
 
     return await prisma.mutation.deletePost(
