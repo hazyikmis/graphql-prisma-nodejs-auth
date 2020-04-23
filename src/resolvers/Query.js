@@ -117,38 +117,51 @@ const Query = {
   posts(parent, args, { prisma }, info) {
     //the code below retrieves info from real database accessed via GraphQL (run on docker)
     //return prisma.query.posts(null, info); //retrieves all SCALAR fields' data
-    const opArgs = {};
+
+    //default opArgs
+    const opArgs = {
+      where: {
+        published: true,
+      },
+    };
 
     if (args.query) {
-      opArgs.where = {
-        OR: [
-          {
-            title_contains: args.query,
-          },
-          {
-            body_contains: args.query,
-          },
-        ],
-      };
+      opArgs.where.OR = [
+        {
+          title_contains: args.query,
+        },
+        {
+          body_contains: args.query,
+        },
+      ];
     }
 
     return prisma.query.posts(opArgs, info);
-    //the code below retrieves info from static db.js
-    /*
-    if (!args.query) {
-      return db.posts;
-    }
-    return db.posts.filter((post) => {
-      const isTitleMatch = post.title
-        .toLowerCase()
-        .includes(args.query.toLowerCase());
-      const isBodyMatch = post.body
-        .toLowerCase()
-        .includes(args.query.toLowerCase());
-      return isTitleMatch || isBodyMatch;
-    });
-    */
   },
+  async myPosts(parent, args, { prisma, request }, info) {
+    const userId = getUserId(request);
+    const opArgs = {
+      where: {
+        author: {
+          id: userId,
+        },
+      },
+    };
+
+    if (args.query) {
+      opArgs.where.OR = [
+        {
+          title_contains: args.query,
+        },
+        {
+          body_contains: args.query,
+        },
+      ];
+    }
+
+    return await prisma.query.posts(opArgs, info);
+  },
+
   //comments(parent, args, { db }, info) {
   //comments query is completely public
   comments(parent, args, { prisma }, info) {

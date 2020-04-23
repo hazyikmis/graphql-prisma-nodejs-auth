@@ -6,6 +6,7 @@ type Query {
   usersByName(query: String): [User!]!
   usersByQuery(id: ID, name: String, email: String, age: Int): [User!]!
   posts(query: String): [Post!]!
+  myPosts(query: String): [Post!]!
   comments: [Comment!]!
 }
 
@@ -73,7 +74,7 @@ input UpdateCommentInput {
 type User {
   id: ID!
   name: String!
-  email: String!
+  email: String
   password: String!
   posts: [Post!]!
   comments: [Comment!]!
