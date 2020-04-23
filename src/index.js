@@ -1,12 +1,13 @@
 //import { GraphQLServer } from "graphql-yoga";
 const { GraphQLServer, PubSub } = require("graphql-yoga");
 
-const { Query } = require("./resolvers/Query");
-const { Mutation } = require("./resolvers/Mutation");
-const { Subscription } = require("./resolvers/Subscription");
-const { User } = require("./resolvers/User");
-const { Post } = require("./resolvers/Post");
-const { Comment } = require("./resolvers/Comment");
+//all resolvers below moved to the "resolvers/index.js"
+// const { Query } = require("./resolvers/Query");
+// const { Mutation } = require("./resolvers/Mutation");
+// const { Subscription } = require("./resolvers/Subscription");
+// const { User } = require("./resolvers/User");
+// const { Post } = require("./resolvers/Post");
+// const { Comment } = require("./resolvers/Comment");
 
 const db = require("./db");
 
@@ -15,19 +16,23 @@ const { prisma } = require("./prisma");
 
 const pubsub = new PubSub();
 
+const { resolvers, fragmentReplacements } = require("./resolvers/index");
+
 //"src/schema.graphql" is similar but not the same with "prisma/datamodel.prisma"
 //schema.graphql used by NodeJS app, as referencing below
 //but datamodel.prisma used by GraphQL Server, when deploying the model
 const server = new GraphQLServer({
   typeDefs: "./src/schema.graphql",
-  resolvers: {
-    Query,
-    Mutation,
-    Subscription,
-    User,
-    Post,
-    Comment,
-  },
+  ////resolvers object defined in "resolvers/index.js" and imported here
+  // resolvers: {
+  //   Query,
+  //   Mutation,
+  //   Subscription,
+  //   User,
+  //   Post,
+  //   Comment,
+  // },
+  resolvers,
   // context: {
   //   db,
   //   pubsub,
@@ -44,6 +49,7 @@ const server = new GraphQLServer({
       request,
     };
   },
+  fragmentReplacements,
 });
 
 //ALTTAKI YONTEM DE OLUR
