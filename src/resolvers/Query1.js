@@ -1,64 +1,15 @@
-//Locking Queries (checking the user using request authorization token)
-//is a little complex, moe complex than mutations. Because, in mutations
-//you can do (create, update, delete) something or not. But in queries,
-//according to user, queries required to behave differently!
-
-const { getUserId } = require("../utils/getUserId");
-
 const Query = {
   hello() {
     console.log("xxx");
     return "Hello GraphQL";
   },
-  //me query is completely private
-  me(parent, args, { prisma, request }, info) {
-    //console.log("xxx");
-    const userId = getUserId(request);
-    return prisma.query.user({
-      where: {
-        id: userId,
-      },
-    });
-  },
-
-  async post(parent, args, { prisma, request }, info) {
-    //we are trying to detect the "post" request/query coming from an authenticated user or not!
-    const userId = getUserId(request, false);
-    //by sending 2nd argument "requireAuth=false", provides us to not throw an error inside the getUserId method
-    //allows userId just being "undefined"
-
-    //Now at this point, with the addition of "requireAuth=false"
-    //we have 2 possibilities: 1.userId="something" 2.userId=undefined
-
-    //Normally, GraphQL Server (localhos:4466) has a "post" query
-    //But we are trying to take the advantage of using "posts" query.
-    //Because, in "post" query, you can make a query only with id
-    //But we need more complex query...
-    //Our purpose is to return a post to everyone if it's published or if not published then return it only to owner
-    const posts = await prisma.query.posts(
-      {
-        where: {
-          id: parseInt(args.id),
-          OR: [
-            {
-              published: true,
-            },
-            {
-              author: {
-                id: userId,
-              },
-            },
-          ],
-        },
-      },
-      info
-    );
-
-    if (posts.length === 0) {
-      throw new Error("Post not found!");
-    }
-
-    return posts[0];
+  me() {
+    console.log("xxx");
+    return {
+      id: "123-2390-aa",
+      name: "Mike",
+      email: "mike@com.be",
+    };
   },
   //usersByName(parent, args, { db }, nfo) {
   users(parent, args, { prisma }, info) {
@@ -150,7 +101,6 @@ const Query = {
     */
   },
   //comments(parent, args, { db }, info) {
-  //comments query is completely public
   comments(parent, args, { prisma }, info) {
     //no arguments defined in comments query, check schema.graphql
     return prisma.query.comments(null, info);

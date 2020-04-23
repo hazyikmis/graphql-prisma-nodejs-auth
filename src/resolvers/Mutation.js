@@ -138,6 +138,9 @@ const Mutation = {
     // }
 
     const userId = getUserId(request);
+    //this code below runs only if the userId detected; means user has been authenticated
+    //otherwise getUserId throws an error!
+
     //return await prisma.mutation.deleteUser({ where: { id: args.id } }, info);
     return await prisma.mutation.deleteUser({ where: { id: userId } }, info);
   },

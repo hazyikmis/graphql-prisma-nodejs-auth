@@ -1,6 +1,7 @@
 type Query {
   hello: String!
   me: User!
+  post(id: ID!): Post!
   users(query: String): [User!]!
   usersByName(query: String): [User!]!
   usersByQuery(id: ID, name: String, email: String, age: Int): [User!]!
