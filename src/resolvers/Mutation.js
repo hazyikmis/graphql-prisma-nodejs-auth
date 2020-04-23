@@ -215,6 +215,18 @@ const Mutation = {
       throw new Error("Unable to update post!");
     }
 
+    //if post published and its state changed to un-published then delete the comments
+    const isPublished = await prisma.exists.Post({
+      id: parseInt(args.id),
+      published: true,
+    });
+
+    if (isPublished && args.data.published === false) {
+      await prisma.mutation.deleteManyComments({
+        where: { post: { id: parseInt(args.id) } },
+      });
+    }
+
     return await prisma.mutation.updatePost(
       {
         where: {
@@ -264,6 +276,15 @@ const Mutation = {
   //we have changed CreateCommentInput, removed "author". Because this info will be extracted from request token
   async createComment(parent, args, { prisma, request }, info) {
     const userId = getUserId(request);
+
+    const postExists = await prisma.exists.Post({
+      id: parseInt(args.data.post),
+      published: true,
+    });
+
+    if (!postExists) {
+      throw new Error("Unable to find post!");
+    }
 
     return await prisma.mutation.createComment(
       {
