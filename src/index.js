@@ -28,10 +28,21 @@ const server = new GraphQLServer({
     Post,
     Comment,
   },
-  context: {
-    db,
-    pubsub,
-    prisma,
+  // context: {
+  //   db,
+  //   pubsub,
+  //   prisma,
+  // },
+  //context object changed to context function to access request
+  //an be able to use http headers (authorization token etc.)
+  context(request) {
+    //console.log(request);
+    return {
+      db,
+      pubsub,
+      prisma,
+      request,
+    };
   },
 });
 

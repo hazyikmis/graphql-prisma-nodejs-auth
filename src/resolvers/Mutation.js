@@ -2,6 +2,8 @@
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
+const { getUserId } = require("../utils/getUserId");
+
 require("dotenv").config();
 
 /*
@@ -148,12 +150,16 @@ const Mutation = {
     );
   },
 
-  async createPost(parent, args, { prisma }, info) {
-    const userExist = await prisma.exists.User({ id: args.data.author });
+  async createPost(parent, args, { prisma, request }, info) {
+    //SINCE we are getting user.id (author) from token, we are no more required it as a parameter/argument
+    //So, we have changed the "CreatePostInput" input type accordingly
+    const userId = getUserId(request);
 
-    if (!userExist) {
-      throw new Error("User not found!");
-    }
+    // const userExist = await prisma.exists.User({ id: args.data.author });
+
+    // if (!userExist) {
+    //   throw new Error("User not found!");
+    // }
 
     return await prisma.mutation.createPost(
       {
@@ -163,7 +169,8 @@ const Mutation = {
           published: args.data.published,
           author: {
             connect: {
-              id: args.data.author,
+              //id: args.data.author,
+              id: userId, //retrieved from token!!!
             },
           },
         },
