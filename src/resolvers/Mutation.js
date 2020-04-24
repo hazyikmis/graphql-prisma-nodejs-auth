@@ -1,8 +1,9 @@
 //const { v4: uuidv4 } = require("uuid");  //no longer being used
 const bcryptjs = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+//const jwt = require("jsonwebtoken");
 
 const { getUserId } = require("../utils/getUserId");
+const { generateToken } = require("../utils/generateToken");
 
 require("dotenv").config();
 
@@ -100,7 +101,8 @@ const Mutation = {
 
     return {
       user,
-      token: jwt.sign({ userId: user.id }, process.env.JWT_SECRET),
+      //token: jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: "7 days" }),
+      token: generateToken(user.id),
     };
   },
 
@@ -123,7 +125,8 @@ const Mutation = {
 
     return {
       user,
-      token: jwt.sign({ userId: user.id }, process.env.JWT_SECRET),
+      //token: jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: "7 days" }),
+      token: generateToken(user.id),
     };
   },
 
