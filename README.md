@@ -22,6 +22,12 @@ By adding this, we are telling NodeJS app that, you can use the "secret" info or
 
 ##-------
 
+The line below added at the beginning of "schema.graphql" file:
+#import UserOrderByInput from "./generated/prisma.graphql"
+(With the number sign # at the beginning. This line imports UserOrderByInput enum types from GraphQL Server (not actually, from the schema get from there), so we can use these enum types in the code & querying from localhost:4000)
+
+##-------
+
 IN THIS PROJECT NodeJs App, queries, and makes CRUD Operations on real database, served by GraphQL --> PostgreSQL, not db.js (satatic data)
 In doing that, it uses the "prisma".
 
