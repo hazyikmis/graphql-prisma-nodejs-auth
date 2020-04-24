@@ -2,12 +2,12 @@ type Query {
   hello: String!
   me: User!
   post(id: ID!): Post!
-  users(query: String): [User!]!
+  users(query: String, first: Int, skip: Int, after: String): [User!]!
   usersByName(query: String): [User!]!
   usersByQuery(id: ID, name: String, email: String, age: Int): [User!]!
-  posts(query: String): [Post!]!
-  myPosts(query: String): [Post!]!
-  comments: [Comment!]!
+  posts(query: String, first: Int, skip: Int, after: String): [Post!]!
+  myPosts(query: String, first: Int, skip: Int, after: String): [Post!]!
+  comments(first: Int, skip: Int, after: String): [Comment!]!
 }
 
 type Mutation {
@@ -80,6 +80,8 @@ type User {
   password: String!
   posts: [Post!]!
   comments: [Comment!]!
+  createdAt: String!
+  updatedAt: String!
 }
 
 type Post {
@@ -89,6 +91,8 @@ type Post {
   published: Boolean!
   author: User!
   comments: [Comment!]!
+  createdAt: String!
+  updatedAt: String!
 }
 
 type Comment {
@@ -96,6 +100,8 @@ type Comment {
   text: String!
   post: Post!
   author: User!
+  createdAt: String!
+  updatedAt: String!
 }
 
 enum MutationType {

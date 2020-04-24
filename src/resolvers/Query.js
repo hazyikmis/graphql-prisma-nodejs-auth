@@ -11,6 +11,7 @@ const Query = {
     return "Hello GraphQL";
   },
   //me query is completely private
+
   me(parent, args, { prisma, request }, info) {
     //console.log("xxx");
     const userId = getUserId(request);
@@ -60,10 +61,17 @@ const Query = {
 
     return posts[0];
   },
+
   //usersByName(parent, args, { db }, nfo) {
   users(parent, args, { prisma }, info) {
     //return prisma.query.users(null, info); //retrieves all SCALAR fields' data
-    const opArgs = {};
+    //const opArgs = {};
+    const opArgs = {
+      first: args.first,
+      skip: args.skip,
+      after: args.after,
+    };
+
     if (args.query) {
       // opArgs.where = {
       //   name_contains: args.query,
@@ -91,6 +99,7 @@ const Query = {
     );
     */
   },
+
   usersByName(parent, args, { db }, nfo) {
     if (!args.query) {
       return db.users;
@@ -99,6 +108,7 @@ const Query = {
       user.name.toLowerCase().includes(args.query.toLowerCase())
     );
   },
+
   usersByQuery(parent, args, { db }, nfo) {
     console.log("xxx");
     if (!args.id && !args.name && !args.email && !args.age) {
@@ -113,6 +123,7 @@ const Query = {
       );
     });
   },
+
   //posts(parent, args, { db }, info) {
   posts(parent, args, { prisma }, info) {
     //the code below retrieves info from real database accessed via GraphQL (run on docker)
@@ -120,6 +131,9 @@ const Query = {
 
     //default opArgs
     const opArgs = {
+      first: args.first,
+      skip: args.skip,
+      after: args.after,
       where: {
         published: true,
       },
@@ -138,9 +152,13 @@ const Query = {
 
     return prisma.query.posts(opArgs, info);
   },
+
   async myPosts(parent, args, { prisma, request }, info) {
     const userId = getUserId(request);
     const opArgs = {
+      first: args.first,
+      skip: args.skip,
+      after: args.after,
       where: {
         author: {
           id: userId,
@@ -166,7 +184,13 @@ const Query = {
   //comments query is completely public
   comments(parent, args, { prisma }, info) {
     //no arguments defined in comments query, check schema.graphql
-    return prisma.query.comments(null, info);
+    //return prisma.query.comments(null, info);
+    const opArgs = {
+      first: args.first,
+      skip: args.skip,
+      after: args.after,
+    };
+    return prisma.query.comments(opArgs, info);
   },
 };
 
