@@ -1,6 +1,14 @@
-endpoint: http://localhost:4466
+#endpoint: http://localhost:4466
+endpoint: ${env:PRISMA_ENDPOINT}
 datamodel: datamodel.prisma
 secret: thisIsMySuperS3cretText
+#endpoint: is the docker container running on our machine
+#if we "prisma deploy", it always deploys to that endpoint
+#we need to switch between development & production deployments to different endpoints
+#(to make it short "endpoint" should be dynamic)
+#We have created "/config" folder and created 2 config files for dev & prod separately
+#AFTER ALL THESE CHANGES, WE NEED TO DEFINE WHICH env config FILE SHOULD BE USED WHEN DEPLOYING
+#-->prisma deploy -e ../config/dev.env
 #service: default
 #stage: default
 #the name of the schema creeated is: default$default

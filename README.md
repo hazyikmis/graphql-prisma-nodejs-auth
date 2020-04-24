@@ -1,3 +1,42 @@
+DEPLOYING:
+requirements:
+-->1-Production database
+-->2-Host our Prisma docker container
+-->3-Host our NodeJS app
+(A-Heroku: has capability to meet all the needs above, for example, for database requirements, it has 3rd party add-on solutions seamlessly integrated with heroku
+B-Prisma Cloud: (Prisma 1 Cloud) (https://app.prisma.io/) Helps us to manage prisma instances)
+//-----------------
+
+----here is the prisma.yml----start
+#endpoint: http://localhost:4466
+endpoint: \${env:PRISMA_ENDPOINT}
+datamodel: datamodel.prisma
+secret: thisIsMySu......
+----here is the prisma.yml----end
+
+//-----------------
+
+#endpoint: is the docker container running on our machine
+#if we "prisma deploy", it always deploys to that endpoint
+#we need to switch between development & production deployments to different endpoints
+#(to make it short "endpoint" should be dynamic)
+#We have created "/config" folder and created 2 config files for dev & prod separately
+#AFTER ALL THESE CHANGES, WE NEED TO DEFINE WHICH env config FILE SHOULD BE USED WHEN DEPLOYING
+#-->prisma deploy -e ../config/dev.env
+
+//-----------------
+
+On the terminal, ">prisma login" works very similarly heroku... It logs you into the https://app.prisma.io/ from the command line.
+
+//-----------------
+
+> prisma deploy -e ../config/prod.env
+
+(IMPORTANT! You need to exec "prisma login" before to deploy your app prod on https://app.prisma.io/)
+If you exec this command with the blank prod.env--->The prisma asks you to which server do you want to use or set up a new prisma server? And your service name and stage names all you decide by answering questions... At the end of deployment the new prod "endpoint" written inside the "prisma.yml". You must remove that info from there -leave it as: "endpoint: \${env:PRISMA_ENDPOINT}"- and copy it into the prod.env. This is the first time process (required to create the server and get the endpoint address). After this first time, for the consecutive deploys, just run the "prisma deploy -e ../config/prod.env"
+
+//-----------------
+
 We have 2 endpoints: localhost:4466 & localhost:4000
 localhost:4000 created and served by NodeJS app, but localhost:4466 created and served by GraphQL Server from docker container. If we define "secret" in the "prisma/prisma.yml" file and then redeploy our app to localhost:4466, its not possible to make queries, mutations, etc from it. And also from localhost:4000. But if we define this secret in the NodeJS app (prisma.js) when defining the prisma (binding), it's possible to communicate with localhost:4000, but still not possible to communicate localhost:4466 on the Playground GraphQL. If we want to test something or work on schema/docs directly on localhost:4466 (GraphQL Server), we need to create token and use it on localhost:4466 Playground. We can create token by typing "prisma token" on the terminal under the "project/prisma" folder. It shows the token. And then, we can use this token int he playground by adding HTTP HEADERS:
 
