@@ -1,3 +1,5 @@
+const { getUserId } = require("../utils/getUserId");
+
 const Subscription = {
   /*
   comment: {
@@ -64,6 +66,28 @@ const Subscription = {
               published: true,
             },
             mutation_in: ["CREATED"],
+          },
+        },
+        info
+      );
+    },
+  },
+  myPost: {
+    subscribe(parent, args, { prisma, request }, info) {
+      const userId = getUserId(request);
+      //BE CAREFUL: Subscriptions are different from Query & Mutations
+      //Becasue Query & Mutations use HTTP, but Subscriptions use WEBSOCKETs
+      //As a result of this, we need to make change inside the getUserId method
+      //in order to extract token correctly from request object
+
+      return prisma.subscription.post(
+        {
+          where: {
+            node: {
+              author: {
+                id: userId,
+              },
+            },
           },
         },
         info
