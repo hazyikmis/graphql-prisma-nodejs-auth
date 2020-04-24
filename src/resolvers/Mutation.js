@@ -1,9 +1,10 @@
 //const { v4: uuidv4 } = require("uuid");  //no longer being used
-const bcryptjs = require("bcryptjs");
-//const jwt = require("jsonwebtoken");
+const bcryptjs = require("bcryptjs"); //still required for validation
+//const jwt = require("jsonwebtoken");  //moved to utils/generateToken.js
 
 const { getUserId } = require("../utils/getUserId");
 const { generateToken } = require("../utils/generateToken");
+const { hashPassword } = require("../utils/hashPassword");
 
 require("dotenv").config();
 
@@ -66,11 +67,13 @@ const Mutation = {
       throw new Error("Email taken!");
     }
 
-    if (args.data.password.length < 8) {
-      throw new Error("Password must be 8 characters or longer!");
-    }
+    // if (args.data.password.length < 8) {
+    //   throw new Error("Password must be 8 characters or longer!");
+    // }
 
-    const hashedPassword = await bcryptjs.hash(args.data.password, 10);
+    // const hashedPassword = await bcryptjs.hash(args.data.password, 10);
+    const hashedPassword = await hashPassword(args.data.password);
+
     //console.log(hashedPassword);
     //return await prisma.mutation.createUser({ data: args.data }, info);
     /*
@@ -153,6 +156,11 @@ const Mutation = {
   //async updateUser(parent, { id, data }, { prisma }, info) {
   async updateUser(parent, { data }, { prisma, request }, info) {
     const userId = getUserId(request);
+
+    if (typeof data.password === "string") {
+      data.password = await hashPassword(data.password);
+    }
+
     return await prisma.mutation.updateUser(
       {
         where: {
