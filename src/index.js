@@ -21,27 +21,30 @@ const { resolvers, fragmentReplacements } = require("./resolvers/index");
 //"src/schema.graphql" is similar but not the same with "prisma/datamodel.prisma"
 //schema.graphql used by NodeJS app, as referencing below
 //but datamodel.prisma used by GraphQL Server, when deploying the model
+
+/*
 const server = new GraphQLServer({
   typeDefs: "./src/schema.graphql",
-  ////resolvers object defined in "resolvers/index.js" and imported here
-  // resolvers: {
-  //   Query,
-  //   Mutation,
-  //   Subscription,
-  //   User,
-  //   Post,
-  //   Comment,
-  // },
+  resolvers: {
+    Query,
+    Mutation,
+    Subscription,
+    User,
+    Post,
+    Comment,
+  },
+  context: {
+    db,
+    pubsub,
+    prisma,
+  },
+});
+*/
+
+const server = new GraphQLServer({
+  typeDefs: "./src/schema.graphql",
   resolvers,
-  // context: {
-  //   db,
-  //   pubsub,
-  //   prisma,
-  // },
-  //context object changed to context function to access request
-  //an be able to use http headers (authorization token etc.)
   context(request) {
-    //console.log(request);
     return {
       db,
       pubsub,
@@ -75,49 +78,9 @@ const server = new GraphQLServer({
 });
 */
 
-server.start(() => {
+//heroku internally assigns a PORT to each app
+//you should not define the PORT, otherwise you'll get an error from heroku
+//server.start(() => {
+server.start({ port: process.env.PORT || 4000 }, () => {
   console.log("The server is up");
 });
-
-/*
-subscription {
-  count
-}
-
-//if you create a new comment for post 12, then you will get that comment instantly with the subscription below
-subscription {
-  comment(postId:"12") {
-    id
-    text
-    author {
-      id
-      name
-    }
-  }
-}
-
-subscription {
-  post {
-    id
-    title
-    body
-    author {
-      id
-      name
-    }
-  }
-}
-
-subscription {
-  post {
-    mutation
-    data {
-			id
-      title
-      body
-      published
-      author {id name}
-    }
-  }
-}
-*/

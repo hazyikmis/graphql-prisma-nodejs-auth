@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/index.js -e js,graphql",
-    "start": "node src/index.js",
+    "dev": "env-cmd -f ./config/dev.env nodemon src/index.js -e js,graphql",
+    "start": "env-cmd -f ./config/prod.env node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "get-schema": "graphql get-schema -p prisma"
   },
@@ -15,6 +15,7 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "dotenv": "^8.2.0",
+    "env-cmd": "^10.1.0",
     "graphql-cli": "^3.0.14",
     "graphql-yoga": "^1.18.3",
     "jsonwebtoken": "^8.5.1",
