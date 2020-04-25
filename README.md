@@ -24,6 +24,9 @@ secret: thisIsMySu......
 #AFTER ALL THESE CHANGES, WE NEED TO DEFINE WHICH env config FILE SHOULD BE USED WHEN DEPLOYING
 #-->prisma deploy -e ../config/dev.env
 
+NOTE: we cannot run env-cmd on the heroku, so we entered the env vars for prod env (which exists in the
+/config/prod.env) to the heroku by "heroku config:set PRISMA_ENDPOINT=https://halil-azy-blog-app-7e918ccab4.herokuapp.com/prisma-service/prod"
+
 //-----------------
 
 On the terminal, ">prisma login" works very similarly heroku... It logs you into the https://app.prisma.io/ from the command line.
@@ -34,6 +37,17 @@ On the terminal, ">prisma login" works very similarly heroku... It logs you into
 
 (IMPORTANT! You need to exec "prisma login" before to deploy your app prod on https://app.prisma.io/)
 If you exec this command with the blank prod.env--->The prisma asks you to which server do you want to use or set up a new prisma server? And your service name and stage names all you decide by answering questions... At the end of deployment the new prod "endpoint" written inside the "prisma.yml". You must remove that info from there -leave it as: "endpoint: \${env:PRISMA_ENDPOINT}"- and copy it into the prod.env. This is the first time process (required to create the server and get the endpoint address). After this first time, for the consecutive deploys, just run the "prisma deploy -e ../config/prod.env"
+
+//-----------------
+
+AFTER DEPLOYMENT TO HEROKU (https://azy-prisma-blog-app.herokuapp.com/), WE HAVE 2 ENDPOINTS:
+1.ACCESSIBLE FROM https://app.prisma.io/ (CORE PLAYGROUND - GRAPHQL SERVER, LIKE localhost:4466)
+2.ACCESSIBLE FROM https://azy-prisma-blog-app.herokuapp.com/ (NODEJS APP, WHICH ACCESS TO 1 , LIKE localhost:4000)
+
+//-----------------
+
+We can arrange env variables differently. For example we could not use .env and "dotenv" npm pack.
+We could store all env vars inside the /config/dev.env & prod.env and use only "env-cmd" npm pack. And enter the values inside the prod.env to heroku...
 
 //-----------------
 
