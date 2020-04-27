@@ -1,18 +1,55 @@
-const { getFirstName, isValidPassword } = require("../src/utils/user");
+require("cross-fetch/polyfill");
+//import ApolloBoost, { gql } from "apollo-boost";
+const ApolloBoost = require("apollo-boost");
+const { gql } = require("apollo-boost");
 
-test("Should extract first name", () => {
-  const firstName = getFirstName("Halil Azy");
+const { prisma } = require("../src/prisma");
 
-  // if (firstName !== "Halil") {
-  //   throw new Error("Expected the string Halil");
-  // }
-  expect(firstName).toBe("Halil");
+const bcryptjs = require("bcryptjs");
+
+const client = new ApolloBoost.default({
+  uri: "http://localhost:4000",
 });
 
-test("Should reject passwords shorter than 8 chars", () => {
-  expect(isValidPassword("halo123")).toBe(false);
+beforeEach(async () => {
+  await prisma.mutation.deleteManyUsers();
+  await prisma.mutation.createUser({
+    data: {
+      name: "Jen",
+      email: "jen@example.com",
+      password: bcryptjs.hashSync("qqqqwwww"),
+    },
+  });
 });
 
-test("Should reject passwords contain the word password", () => {
-  expect(isValidPassword("halopassword00")).toBe(false);
+test("Should create a new user", async () => {
+  const createUser = gql`
+    mutation {
+      createUser(
+        data: {
+          name: "Andrew"
+          email: "andrew@example.com"
+          password: "qqqqwwww"
+        }
+      ) {
+        token
+        user {
+          id
+          name
+          email
+          password
+        }
+      }
+    }
+  `;
+
+  const response = client.mutate({
+    mutation: createUser,
+  });
+
+  const exist = await prisma.exists.User({
+    id: response.data.createUser.user.id,
+  });
+
+  expect(exists).toBe(true);
 });
